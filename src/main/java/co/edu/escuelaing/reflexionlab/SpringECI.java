@@ -1,24 +1,25 @@
 package co.edu.escuelaing.reflexionlab;
 
+
+import co.edu.escuelaing.reflexionlab.annotations.GetMapping;
+import co.edu.escuelaing.reflexionlab.annotations.RequestParam;
+import co.edu.escuelaing.reflexionlab.annotations.RestController;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 public class SpringECI {
-
     public static void main(String[] args) throws ClassNotFoundException, MalformedURLException, InvocationTargetException, IllegalAccessException {
-        // Cargar la clase proporcionada como argumento
         Class<?> c = Class.forName(args[0]);
         Map<String, Method> services = new HashMap<>();
 
-        // Verificar si la clase está anotada con @RestController
         if (c.isAnnotationPresent(RestController.class)) {
             Method[] methods = c.getDeclaredMethods();
-
-            // Recorrer los métodos y agregar los que tienen @GetMapping al mapa
             for (Method m : methods) {
                 if (m.isAnnotationPresent(GetMapping.class)) {
                     String key = m.getAnnotation(GetMapping.class).value();
@@ -27,33 +28,54 @@ public class SpringECI {
             }
         }
 
-        // Procesar las solicitudes simuladas con URLs
-        processRequest(services, "http://localhost:8080/App/hello");
-        processRequest(services, "http://localhost:8080/App/time");
-        processRequest(services, "http://localhost:8080/App/uuid");
-        processRequest(services, "http://localhost:8080/App/bye");
-        processRequest(services, "http://localhost:8080/App/dayofweek");
-    }
 
-    // Método auxiliar para procesar cada solicitud
-    private static void processRequest(Map<String, Method> services, String urlString) throws MalformedURLException, InvocationTargetException, IllegalAccessException {
-        URL serviceurl = new URL(urlString);
+        URL serviceurl = new URL("http://localhost:8080/App/greeting?name=Juanes");
         String path = serviceurl.getPath();
+        String query = serviceurl.getQuery();
         System.out.println("Path: " + path);
+        System.out.println("Query: " + query);
 
-        // Extraer el nombre del servicio de la ruta
-        String serviceName = path.substring("/App/".length());
+
+        String serviceName = path.substring(4);
         System.out.println("Service Name: " + serviceName);
 
-        // Obtener el método correspondiente al servicio
-        Method ms = services.get(serviceName);
 
+        Method ms = services.get(serviceName);
         if (ms != null) {
-            // Invocar el método y mostrar la respuesta
-            Object response = ms.invoke(null);
-            System.out.println("Respuesta del servicio: " + response);
+            Object[] argsToPass = extractArguments(ms, query); // Extraer parámetros de la consulta
+            System.out.println("Respuesta servicio: " + ms.invoke(null, argsToPass));
         } else {
             System.out.println("Servicio no encontrado: " + serviceName);
         }
+    }
+
+    private static Object[] extractArguments(Method method, String query) {
+        Map<String, String> queryParams = parseQuery(query);
+        Parameter[] parameters = method.getParameters();
+        Object[] args = new Object[parameters.length];
+
+        for (int i = 0; i < parameters.length; i++) {
+            if (parameters[i].isAnnotationPresent(RequestParam.class)) {
+                RequestParam annotation = parameters[i].getAnnotation(RequestParam.class);
+                String paramName = annotation.value();
+                String value = queryParams.getOrDefault(paramName, annotation.defaultValue());
+                args[i] = value;
+            }
+        }
+        return args;
+    }
+
+    private static Map<String, String> parseQuery(String query) {
+        Map<String, String> queryParams = new HashMap<>();
+        if (query != null) {
+            String[] pairs = query.split("&");
+            for (String pair : pairs) {
+                String[] keyValue = pair.split("=");
+                if (keyValue.length > 1) {
+                    queryParams.put(keyValue[0], keyValue[1]);
+                }
+            }
+        }
+        return queryParams;
     }
 }

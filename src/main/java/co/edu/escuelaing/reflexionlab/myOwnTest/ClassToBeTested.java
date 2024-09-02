@@ -1,4 +1,4 @@
-package co.edu.escuelaing.reflexionlab;
+package co.edu.escuelaing.reflexionlab.myOwnTest;
 
 public class ClassToBeTested {
     @Test
