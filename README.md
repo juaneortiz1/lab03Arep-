@@ -38,6 +38,7 @@ To run different components of the project, use the following commands:
    java -cp target/lab03Arep-1.0-SNAPSHOT.jar:. co.edu.escuelaing.reflexionlab.SpringECI co.edu.escuelaing.reflexionlab.HelloService
    ```
    This command invokes methods in `HelloService` based on the URL provided in the code. Modify the URL in the `SpringECI` class as needed.
+
    ![SpringECI](https://github.com/user-attachments/assets/b86910fc-c8eb-4ce7-8bf1-14bf41bc33a3)
 
 3. **Running the Simple HTTP Server:**
