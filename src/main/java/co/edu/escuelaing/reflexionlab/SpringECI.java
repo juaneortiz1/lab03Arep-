@@ -13,6 +13,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A utility class for invoking methods in a service class based on a URL.
+ * Demonstrates how to extract method parameters from a query string and invoke the method.
+ */
 public class SpringECI {
     public static void main(String[] args) throws ClassNotFoundException, MalformedURLException, InvocationTargetException, IllegalAccessException {
         Class<?> c = Class.forName(args[0]);
@@ -49,6 +53,13 @@ public class SpringECI {
         }
     }
 
+    /**
+     * Extracts method arguments from a query string based on method parameters and annotations.
+     *
+     * @param method the method to extract arguments for
+     * @param query the query string from the URL
+     * @return an array of arguments for the method
+     */
     private static Object[] extractArguments(Method method, String query) {
         Map<String, String> queryParams = parseQuery(query);
         Parameter[] parameters = method.getParameters();
@@ -65,6 +76,12 @@ public class SpringECI {
         return args;
     }
 
+    /**
+     * Parses a query string into a map of query parameters.
+     *
+     * @param query the query string
+     * @return a map of query parameters
+     */
     private static Map<String, String> parseQuery(String query) {
         Map<String, String> queryParams = new HashMap<>();
         if (query != null) {

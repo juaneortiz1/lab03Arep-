@@ -9,17 +9,21 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SimpleHttpServer {
 
+/**
+ * A simple HTTP server that handles incoming HTTP requests and dispatches them to appropriate methods
+ * based on annotations in the service class.
+ */
+public class SimpleHttpServer {
     private static final String STATIC_FILES_DIR = "src/main/resources";
     private static final Map<String, Method> services = new HashMap<>();
     private static Object serviceInstance;
 
     public static void main(String[] args) throws Exception {
-        StaticFiles.setLocation(STATIC_FILES_DIR);
         Class<?> c = Class.forName("co.edu.escuelaing.reflexionlab.HelloService");
         if (c.isAnnotationPresent(RestController.class)) {
             serviceInstance = c.getDeclaredConstructor().newInstance();
@@ -42,6 +46,12 @@ public class SimpleHttpServer {
         }
     }
 
+    /**
+     * Handles incoming HTTP requests.
+     *
+     * @param clientSocket the client socket
+     * @throws IOException if an error occurs while handling the request
+     */
     private static void handleRequest(Socket clientSocket) throws IOException {
         InputStream inputStream = null;
         OutputStream outputStream = null;
@@ -64,16 +74,15 @@ public class SimpleHttpServer {
             if (serviceMethod != null) {
                 try {
                     Object[] methodParams = extractArguments(serviceMethod, requestDetails.queryParams);
-
                     String response = (String) serviceMethod.invoke(serviceInstance, methodParams);
-                    outputStream.write(("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n" + response).getBytes());
+                    outputStream.write(("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + response.length() + "\r\n\r\n" + response).getBytes());
                 } catch (Exception e) {
                     e.printStackTrace();
                     outputStream.write("HTTP/1.1 500 Internal Server Error\r\n\r\n".getBytes());
                 }
             } else {
-
-                StaticFiles.serveStaticFile(requestDetails.path, outputStream);
+                String response = HelloService.serveStaticFile(requestDetails.path);
+                outputStream.write(response.getBytes());
             }
         } finally {
             if (inputStream != null) {
@@ -86,7 +95,12 @@ public class SimpleHttpServer {
     }
 
 
-
+    /**
+     * Parses an HTTP request string to extract the request path and query parameters.
+     *
+     * @param request the HTTP request string
+     * @return the parsed request details
+     */
     private static RequestDetails parseRequest(String request) {
         String[] requestParts = request.split(" ");
         if (requestParts.length > 1) {
@@ -116,7 +130,13 @@ public class SimpleHttpServer {
     }
 
 
-
+    /**
+     * Extracts method arguments from the query parameters based on method annotations.
+     *
+     * @param method the method to extract arguments for
+     * @param queryParams the query parameters
+     * @return an array of arguments for the method
+     */
     private static Object[] extractArguments(Method method, Map<String, String> queryParams) {
         Parameter[] parameters = method.getParameters();
         Object[] args = new Object[parameters.length];
@@ -132,6 +152,10 @@ public class SimpleHttpServer {
         return args;
     }
 
+
+    /**
+     * Holds request details including path and query parameters.
+     */
     private static class RequestDetails {
         String path;
         Map<String, String> queryParams;
