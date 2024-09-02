@@ -24,13 +24,16 @@ To run different components of the project, use the following commands:
 
 1. **Running Tests:**
    The testing framework included in the project uses the `@Test` annotation to mark test methods. The `JUnitEci` class is responsible for running these tests and reporting their results. Tests are defined in the `ClassToBeTested` class, with each method annotated to indicate that it should be executed as a test.
+   
    ```bash
    java -cp target/lab03Arep-1.0-SNAPSHOT.jar:. co.edu.escuelaing.reflexionlab.myOwnTest.JUnitEci co.edu.escuelaing.reflexionlab.myOwnTest.ClassToBeTested
    ```
    This command runs the tests defined in `ClassToBeTested` using the custom testing framework.
+   
    ![JUnitEci](https://github.com/user-attachments/assets/21ca4c31-1f9b-4ae6-9c77-67f6b2b95d61)
 
 2. **Running the SpringECI Utility:**
+
    ```bash
    java -cp target/lab03Arep-1.0-SNAPSHOT.jar:. co.edu.escuelaing.reflexionlab.SpringECI co.edu.escuelaing.reflexionlab.HelloService
    ```
@@ -38,13 +41,17 @@ To run different components of the project, use the following commands:
    ![SpringECI](https://github.com/user-attachments/assets/b86910fc-c8eb-4ce7-8bf1-14bf41bc33a3)
 
 3. **Running the Simple HTTP Server:**
+
    ```bash
    java -cp target/classes co.edu.escuelaing.reflexionlab.SimpleHttpServer
    ```
    This starts the HTTP server on port 8080. It serves static files from the `src/main/resources` directory and handles HTTP requests.
    ![SimpleHttpServer](https://github.com/user-attachments/assets/9fe8dde0-699c-4f1e-a5f2-97688a2cb392)
+
    ![Server Execution](https://github.com/user-attachments/assets/4351723e-36a2-49f2-aab5-48caa24b6068)
+
    ![HTTP Handling](https://github.com/user-attachments/assets/68c8f734-c6c5-451a-82b9-b7fdd8662e85)
+
    ![Static File Serving](https://github.com/user-attachments/assets/8a11f29a-d81e-48f9-962b-b27cf0ef5ab5)
 
 ## Cloning the Repository
@@ -52,6 +59,7 @@ To run different components of the project, use the following commands:
 To clone the repository and set up the project locally, use the following commands:
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/juaneortiz1/lab03Arep-.git
    ```
